@@ -14,7 +14,6 @@
 
 namespace SWP\Bundle\MultiTenancyBundle;
 
-use SWP\Bundle\MultiTenancyBundle\DependencyInjection\Compiler\ConfigurePrefixCandidatesCompilerPass;
 use SWP\Bundle\MultiTenancyBundle\DependencyInjection\Compiler\RegisterOrganizationFactoryPass;
 use SWP\Bundle\MultiTenancyBundle\DependencyInjection\Compiler\RegisterTenantFactoryCompilerPass;
 use SWP\Bundle\StorageBundle\DependencyInjection\Bundle\Bundle;
@@ -26,7 +25,6 @@ class SWPMultiTenancyBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
-        $container->addCompilerPass(new ConfigurePrefixCandidatesCompilerPass());
         $container->addCompilerPass(new RegisterTenantFactoryCompilerPass());
         $container->addCompilerPass(new RegisterOrganizationFactoryPass());
     }
