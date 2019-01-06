@@ -42,17 +42,6 @@ class SWPMultiTenancyExtension extends Extension
 
         $backendEnabled = false;
 
-        if ($config['persistence']['phpcr']['enabled']) {
-            $this->loadPhpcr($config['persistence']['phpcr'], $loader, $container);
-            $this->registerStorage(
-                Drivers::DRIVER_DOCTRINE_PHPCR_ODM,
-                $config['persistence']['phpcr']['classes'],
-                $container
-            );
-
-            $backendEnabled = true;
-        }
-
         if ($config['persistence']['orm']['enabled']) {
             $this->registerStorage(
                 Drivers::DRIVER_DOCTRINE_ORM,
@@ -64,39 +53,11 @@ class SWPMultiTenancyExtension extends Extension
         }
 
         if (!$backendEnabled) {
-            throw new InvalidConfigurationException('You need to enable one of the peristence backends (phpcr or orm)');
+            throw new InvalidConfigurationException('You need to enable one the orm peristence backend');
         }
 
         if ($config['use_orm_listeners']) {
             $loader->load('listeners.yml');
         }
-    }
-
-    public function loadPhpcr($config, YamlFileLoader $loader, ContainerBuilder $container)
-    {
-        $keys = [
-            'basepath' => 'basepath',
-            'route_basepaths' => 'route_basepaths',
-            'content_basepath' => 'content_basepath',
-            'menu_basepath' => 'menu_basepath',
-            'media_basepath' => 'media_basepath',
-            'tenant_aware_router_class' => 'router.class',
-        ];
-
-        foreach ($keys as $sourceKey => $targetKey) {
-            $container->setParameter(
-                $this->getAlias().'.persistence.phpcr.'.$targetKey,
-                $config[$sourceKey]
-            );
-        }
-
-        array_push($config['route_basepaths'], $config['content_basepath'], $config['menu_basepath'], $config['media_basepath']);
-
-        $container->setParameter(
-            $this->getAlias().'.persistence.phpcr.base_paths',
-            $config['route_basepaths']
-        );
-
-        $loader->load('phpcr.yml');
     }
 }

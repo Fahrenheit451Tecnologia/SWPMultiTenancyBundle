@@ -17,7 +17,6 @@ namespace SWP\Bundle\MultiTenancyBundle;
 use SWP\Bundle\MultiTenancyBundle\DependencyInjection\Compiler\ConfigurePrefixCandidatesCompilerPass;
 use SWP\Bundle\MultiTenancyBundle\DependencyInjection\Compiler\RegisterOrganizationFactoryPass;
 use SWP\Bundle\MultiTenancyBundle\DependencyInjection\Compiler\RegisterTenantFactoryCompilerPass;
-use SWP\Bundle\MultiTenancyBundle\DependencyInjection\Compiler\TenantAwareRouterCompilerPass;
 use SWP\Bundle\StorageBundle\DependencyInjection\Bundle\Bundle;
 use SWP\Bundle\StorageBundle\Drivers;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -28,7 +27,6 @@ class SWPMultiTenancyBundle extends Bundle
     {
         parent::build($container);
         $container->addCompilerPass(new ConfigurePrefixCandidatesCompilerPass());
-        $container->addCompilerPass(new TenantAwareRouterCompilerPass());
         $container->addCompilerPass(new RegisterTenantFactoryCompilerPass());
         $container->addCompilerPass(new RegisterOrganizationFactoryPass());
     }
@@ -39,7 +37,6 @@ class SWPMultiTenancyBundle extends Bundle
     public function getSupportedDrivers()
     {
         return [
-            Drivers::DRIVER_DOCTRINE_PHPCR_ODM,
             Drivers::DRIVER_DOCTRINE_ORM,
         ];
     }

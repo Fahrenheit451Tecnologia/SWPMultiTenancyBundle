@@ -15,7 +15,6 @@
 namespace SWP\Bundle\MultiTenancyBundle\Factory;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ODM\PHPCR\HierarchyInterface;
 use SWP\Component\MultiTenancy\Factory\OrganizationFactoryInterface;
 
 class OrganizationFactory implements OrganizationFactoryInterface
@@ -65,12 +64,6 @@ class OrganizationFactory implements OrganizationFactoryInterface
      */
     public function createWithCode()
     {
-        $organization = $this->decoratedFactory->createWithCode();
-
-        if ($organization instanceof HierarchyInterface) {
-            $organization->setParentDocument($this->documentManager->find(null, $this->rootPath));
-        }
-
-        return $organization;
+        return $this->decoratedFactory->createWithCode();
     }
 }
