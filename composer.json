@@ -21,7 +21,7 @@
         "swp/multi-tenancy": "^1.4",
         "swp/storage-bundle": "^1.4",
         "doctrine/doctrine-bundle": "^1.6",
-        "twig/twig": "^1.24.0",
+        "twig/twig": "^2.0",
         "ocramius/proxy-manager": "^2.0",
         "symfony/dependency-injection": "^4.0",
         "symfony/expression-language": "^4.0",
