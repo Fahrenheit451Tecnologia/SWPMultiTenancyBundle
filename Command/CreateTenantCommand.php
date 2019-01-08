@@ -69,8 +69,8 @@ EOT
         $host = $input->getArgument($this->arguments[0]);
         $domain = HostParser::extractDomain($host);
         $subdomain = HostParser::extractSubdomain($host);
-        $name = $input->getArgument($this->arguments[2]);
-        $organizationCode = $input->getArgument($this->arguments[3]);
+        $name = $input->getArgument($this->arguments[1]);
+        $organizationCode = $input->getArgument($this->arguments[2]);
         $default = $input->getOption('default');
         $disabled = $input->getOption('disabled');
 
