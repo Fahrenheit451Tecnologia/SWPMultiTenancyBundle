@@ -15,6 +15,7 @@
 namespace SWP\Bundle\MultiTenancyBundle\Command;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use SWP\Bundle\MultiTenancyBundle\Parser\HostParser;
 use SWP\Component\MultiTenancy\Model\OrganizationInterface;
 use SWP\Component\MultiTenancy\Model\TenantInterface;
 use SWP\Component\MultiTenancy\Repository\OrganizationRepositoryInterface;
@@ -36,7 +37,7 @@ class CreateTenantCommand extends ContainerAwareCommand
     /**
      * @var array
      */
-    protected $arguments = ['domain', 'subdomain', 'name', 'organization code'];
+    protected $arguments = ['domain', 'name', 'organization code'];
 
     /**
      * {@inheritdoc}
@@ -47,10 +48,9 @@ class CreateTenantCommand extends ContainerAwareCommand
             ->setName('swp:tenant:create')
             ->setDescription('Creates a new tenant.')
             ->setDefinition([
-                new InputArgument($this->arguments[3], InputArgument::OPTIONAL, 'Organization code'),
-                new InputArgument($this->arguments[0], InputArgument::OPTIONAL, 'Domain name'),
-                new InputArgument($this->arguments[2], InputArgument::OPTIONAL, 'Tenant name'),
-                new InputArgument($this->arguments[1], InputArgument::OPTIONAL, 'Subdomain name', null),
+                new InputArgument($this->arguments[2], InputArgument::OPTIONAL, 'Organization code'),
+                new InputArgument($this->arguments[0], InputArgument::OPTIONAL, 'Domain name including subdomain'),
+                new InputArgument($this->arguments[1], InputArgument::OPTIONAL, 'Tenant name'),
                 new InputOption('disabled', null, InputOption::VALUE_NONE, 'Set the tenant as a disabled'),
                 new InputOption('default', null, InputOption::VALUE_NONE, 'Creates the default tenant'),
             ])
@@ -66,8 +66,9 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $domain = $input->getArgument($this->arguments[0]);
-        $subdomain = $input->getArgument($this->arguments[1]);
+        $host = $input->getArgument($this->arguments[0]);
+        $domain = HostParser::extractDomain($host);
+        $subdomain = HostParser::extractSubdomain($host);
         $name = $input->getArgument($this->arguments[2]);
         $organizationCode = $input->getArgument($this->arguments[3]);
         $default = $input->getOption('default');
