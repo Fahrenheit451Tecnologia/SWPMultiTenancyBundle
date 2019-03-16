@@ -57,6 +57,7 @@ services:
     swp_multi_tenancy.tenant.console_command.listener:
         class: SWP\Bundle\MultiTenancyBundle\EventListener\ConsoleCommandTenantListener
         arguments:
+            - '@doctrine'
             - '@swp_multi_tenancy.tenant_context'
             - '@swp.repository.tenant'
         tags:

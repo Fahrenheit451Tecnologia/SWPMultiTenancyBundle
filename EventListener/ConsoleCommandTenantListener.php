@@ -14,8 +14,10 @@
 
 namespace SWP\Bundle\MultiTenancyBundle\EventListener;
 
+use Doctrine\ORM\EntityManagerInterface;
 use SWP\Component\MultiTenancy\Context\TenantContextInterface;
 use SWP\Component\MultiTenancy\Repository\TenantRepositoryInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 /**
@@ -25,6 +27,11 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
  */
 class ConsoleCommandTenantListener
 {
+    /**
+     * @var RegistryInterface
+     */
+    protected $doctrine;
+
     /**
      * @var TenantContextInterface
      */
@@ -36,12 +43,21 @@ class ConsoleCommandTenantListener
     protected $tenantRepository;
 
     /**
-     * ConsoleCommandTenantListener constructor.
-     *
-     * @param TenantContextInterface $tenantContext
+     * @var EntityManagerInterface
      */
-    public function __construct(TenantContextInterface $tenantContext, TenantRepositoryInterface $tenantRepository)
-    {
+    protected $entityManager;
+
+    /**
+     * @param RegistryInterface $doctrine
+     * @param TenantContextInterface $tenantContext
+     * @param TenantRepositoryInterface $tenantRepository
+     */
+    public function __construct(
+        RegistryInterface $doctrine,
+        TenantContextInterface $tenantContext,
+        TenantRepositoryInterface $tenantRepository
+    ) {
+        $this->doctrine = $doctrine;
         $this->tenantContext = $tenantContext;
         $this->tenantRepository = $tenantRepository;
     }
@@ -55,14 +71,20 @@ class ConsoleCommandTenantListener
             return;
         }
 
-        $tenantCode = $event->getInput()->getOption('tenant');
-        if (null !== $tenantCode) {
-            $tenant = $this->tenantRepository->findOneByCode($tenantCode);
-            if (null !== $tenant) {
-                $this->tenantContext->setTenant($tenant);
-            } else {
-                throw new \RuntimeException(sprintf('Tenant with code %s was not found', $tenantCode));
-            }
+        if (null === $tenantCode = $event->getInput()->getOption('tenant')) {
+            return;
         }
+
+        if (null === $tenant = $this->tenantRepository->findOneByCode($tenantCode)) {
+            throw new \RuntimeException(sprintf('Tenant with code %s was not found', $tenantCode));
+        }
+
+        $this->tenantContext->setTenant($tenant);
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = $this->doctrine->getManager();
+        $entityManager
+            ->getFilters()
+            ->enable('tenantable')
+            ->setParameter('tenantCode', $tenant->getCode());
     }
 }
